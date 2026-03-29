@@ -206,7 +206,7 @@
 </div>
 
 <div class="ticker">
-  <span>● CHOPPY BOT LIVE &nbsp;·&nbsp; VOICE ACTIVE &nbsp;·&nbsp; WEB SEARCH ON &nbsp;·&nbsp; FIELDSYNC MVP COMPLETE &nbsp;·&nbsp; choppy.kingstondatagroup.com DEPLOYED &nbsp;·&nbsp; NEXT: FIELDSYNC DEPLOY · EMPLOYEE MGMT · MOBILE DASHBOARD · PAID PLANS &nbsp;·&nbsp; SESSION UPTIME: <span id="uptime">00:00:00</span> &nbsp;·&nbsp;</span>
+  <span>● CHOPPY BOT v2 LIVE &nbsp;·&nbsp; VOICE INPUT + TTS REPLIES &nbsp;·&nbsp; WEB SEARCH ON &nbsp;·&nbsp; PERSISTENT MEMORY ACTIVE &nbsp;·&nbsp; FIELDSYNC MVP COMPLETE &nbsp;·&nbsp; choppy.kingstondatagroup.com DEPLOYED &nbsp;·&nbsp; NEXT: EMPLOYEE MGMT · MOBILE DASHBOARD · PAID PLANS &nbsp;·&nbsp; SESSION UPTIME: <span id="uptime">00:00:00</span> &nbsp;·&nbsp;</span>
 </div>
 
 <div class="workspace">
@@ -247,7 +247,25 @@
       <div class="char" style="left:34px;bottom:50px">🤖</div>
       <div class="thought" style="left:62px;bottom:90px">listening...<br>transcribing...</div>
 
-      <!-- Desk 2 — Web Search -->
+      <!-- Desk 2 — Memory -->
+      <div class="desk" style="left:50%;transform:translateX(-50%);width:70px">
+        <div class="desk-leg" style="left:6px"></div>
+        <div class="desk-leg" style="right:6px"></div>
+      </div>
+      <div class="monitor" style="left:50%;transform:translateX(-50%);bottom:44px">
+        <div class="screen">
+          <div class="code-line" style="width:80%;animation-delay:0.3s"></div>
+          <div class="code-line" style="animation-delay:0.5s"></div>
+          <div class="code-line" style="animation-delay:0.7s"></div>
+          <div class="code-line" style="animation-delay:0.9s"></div>
+        </div>
+        <div class="monitor-stand"></div>
+      </div>
+      <div class="chair" style="left:50%;transform:translateX(-50%)"></div>
+      <div class="char" style="left:calc(50% - 8px);bottom:50px">🧠</div>
+      <div class="thought" style="left:calc(50% + 14px);bottom:90px">saving<br>memory...</div>
+
+      <!-- Desk 3 — Web Search / TTS -->
       <div class="desk" style="right:18px;width:80px">
         <div class="desk-leg" style="left:6px"></div>
         <div class="desk-leg" style="right:6px"></div>
@@ -263,8 +281,8 @@
         <div class="monitor-stand"></div>
       </div>
       <div class="chair" style="right:30px"></div>
-      <div class="char" style="right:34px;bottom:50px">📡</div>
-      <div class="thought" style="right:80px;bottom:90px">searching<br>web...</div>
+      <div class="char" style="right:34px;bottom:50px">🔊</div>
+      <div class="thought" style="right:80px;bottom:90px">web search<br>+ TTS...</div>
 
       <div class="floor-tiles">
         <div class="tile"></div><div class="tile"></div><div class="tile"></div>
@@ -294,6 +312,43 @@
           <span class="tc-tag">Telegram</span>
           <span class="tc-tag">Groq Whisper</span>
           <span class="tc-tag">Claude Sonnet</span>
+        </div>
+      </div>
+
+      <div class="task-card doing">
+        <div class="tc-top">
+          <div class="tc-name">🧠 Persistent Memory</div>
+          <span class="tc-badge badge-live">LIVE</span>
+        </div>
+        <div class="tc-desc">Saving important facts across sessions. Say "remember that..." and Choppy stores it in Supabase forever.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="steps">
+          <div class="step done"><div class="step-dot"></div><span>Supabase choppy_memory table</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Auto-detect remember requests</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Inject memories into system prompt</span></div>
+          <div class="step done"><div class="step-dot"></div><span>/memory · /forget commands</span></div>
+        </div>
+        <div class="tc-tags">
+          <span class="tc-tag">Supabase</span>
+          <span class="tc-tag">Persistent</span>
+        </div>
+      </div>
+
+      <div class="task-card doing">
+        <div class="tc-top">
+          <div class="tc-name">🔊 Voice Replies (TTS)</div>
+          <span class="tc-badge badge-live">LIVE</span>
+        </div>
+        <div class="tc-desc">Choppy can talk back. Toggle with /voice — replies arrive as voice notes in Telegram.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="steps">
+          <div class="step done"><div class="step-dot"></div><span>node-gtts text-to-speech engine</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Markdown stripped for clean audio</span></div>
+          <div class="step done"><div class="step-dot"></div><span>/voice toggle per session</span></div>
+        </div>
+        <div class="tc-tags">
+          <span class="tc-tag">Google TTS</span>
+          <span class="tc-tag">Free</span>
         </div>
       </div>
 
@@ -429,7 +484,7 @@
     <div class="stats-row">
       <div class="stat-box"><div class="sn">2</div><div class="sl">Active</div></div>
       <div class="stat-box"><div class="sn">1</div><div class="sl">Paused</div></div>
-      <div class="stat-box"><div class="sn" id="queue-count">7</div><div class="sl">Queued</div></div>
+      <div class="stat-box"><div class="sn" id="queue-count">5</div><div class="sl">Queued</div></div>
     </div>
 
     <div class="queue-section">
@@ -437,10 +492,10 @@
       <div class="qi">
         <div class="qi-num">1</div>
         <div class="qi-body">
-          <div class="qi-name">🚀 Deploy to production</div>
-          <div class="qi-sub">Railway or Render · 24/7 uptime</div>
+          <div class="qi-name">✅ Deployed to Railway</div>
+          <div class="qi-sub">fieldsync.kingstondatagroup.com · live</div>
         </div>
-        <span class="qi-pri pri-h">HIGH</span>
+        <span class="qi-pri pri-h" style="background:#052e16;color:#4ade80">DONE</span>
       </div>
       <div class="qi">
         <div class="qi-num">2</div>
@@ -477,20 +532,20 @@
     </div>
 
     <div class="queue-section">
-      <div class="qs-title">Choppy Bot v2</div>
+      <div class="qs-title">Choppy Bot v3</div>
       <div class="qi">
         <div class="qi-num">6</div>
         <div class="qi-body">
-          <div class="qi-name">🧠 Persistent memory</div>
-          <div class="qi-sub">Remember across sessions</div>
+          <div class="qi-name">🖼️ Image understanding</div>
+          <div class="qi-sub">Send a photo · Choppy analyzes it</div>
         </div>
         <span class="qi-pri pri-m">MED</span>
       </div>
       <div class="qi">
         <div class="qi-num">7</div>
         <div class="qi-body">
-          <div class="qi-name">🗣️ Voice replies</div>
-          <div class="qi-sub">Text-to-speech · Choppy talks back</div>
+          <div class="qi-name">📅 Reminders & scheduling</div>
+          <div class="qi-sub">Set reminders · cron-based alerts</div>
         </div>
         <span class="qi-pri pri-l">LOW</span>
       </div>
