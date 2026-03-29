@@ -8,125 +8,194 @@
     body { background: #0a0a1a; font-family: 'Courier New', monospace; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; }
 
     /* Header */
-    .header { padding: 16px 32px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 16px; color: #38bdf8; letter-spacing: 2px; text-transform: uppercase; }
-    .clock { font-size: 13px; color: #475569; }
+    .header { padding: 14px 32px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 15px; color: #38bdf8; letter-spacing: 2px; text-transform: uppercase; }
+    .clock { font-size: 12px; color: #475569; }
 
-    /* Floor layout */
-    .floor { display: flex; gap: 24px; padding: 32px; align-items: flex-start; flex-wrap: wrap; }
+    /* Ticker */
+    .ticker { background: #060612; border-bottom: 1px solid #1e293b; padding: 5px 0; font-size: 11px; color: #1e40af; overflow: hidden; white-space: nowrap; }
+    .ticker span { display: inline-block; animation: ticker 30s linear infinite; padding-left: 100%; }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
 
-    /* Room */
-    .room { border: 2px solid; border-radius: 4px; padding: 0; min-width: 280px; flex: 1; position: relative; overflow: hidden; }
-    .room.active  { border-color: #22c55e; background: #052e16; }
-    .room.paused  { border-color: #f59e0b; background: #1c1007; }
-    .room.standby { border-color: #334155; background: #0f172a; }
+    /* Main grid */
+    .workspace { display: grid; grid-template-columns: 1fr 1fr 320px; gap: 0; min-height: calc(100vh - 90px); }
 
-    .room-label { padding: 8px 14px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid; display: flex; align-items: center; justify-content: space-between; }
-    .room.active  .room-label { border-color: #22c55e; color: #4ade80; background: #052e16; }
-    .room.paused  .room-label { border-color: #f59e0b; color: #fbbf24; background: #1c1007; }
-    .room.standby .room-label { border-color: #334155; color: #64748b; background: #0f172a; }
+    /* Columns */
+    .col { border-right: 1px solid #1e293b; display: flex; flex-direction: column; }
+    .col:last-child { border-right: none; }
+    .col-header { padding: 10px 16px; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .room.active  .status-dot { background: #22c55e; animation: pulse 1.5s infinite; }
-    .room.paused  .status-dot { background: #f59e0b; animation: blink 2s infinite; }
-    .room.standby .status-dot { background: #334155; }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    /* Active column */
+    .col.active .col-header { color: #4ade80; background: #020f07; }
+    .col.paused .col-header { color: #fbbf24; background: #0d0800; }
+    .col.standby .col-header { color: #475569; background: #080810; }
 
-    /* Scene canvas */
-    .scene { position: relative; height: 180px; padding: 12px; }
+    .hdr-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .col.active  .hdr-dot { background: #22c55e; animation: pulse 1.5s infinite; }
+    .col.paused  .hdr-dot { background: #f59e0b; animation: blink 2s infinite; }
+    .col.standby .hdr-dot { background: #334155; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-    /* Floor line */
-    .floor-line { position: absolute; bottom: 40px; left: 12px; right: 12px; height: 2px; background: rgba(255,255,255,0.08); }
+    /* 2D Scene */
+    .scene { position: relative; height: 220px; overflow: hidden; border-bottom: 1px solid #1e293b; }
+    .col.active  .scene { background: radial-gradient(ellipse at 50% 100%, #031a0a 0%, #0a0a1a 70%); }
+    .col.paused  .scene { background: radial-gradient(ellipse at 50% 100%, #160c00 0%, #0a0a1a 70%); }
+    .col.standby .scene { background: #0a0a1a; }
 
-    /* Pixel art elements */
-    .pixel { position: absolute; image-rendering: pixelated; font-size: 28px; line-height: 1; }
+    /* Floor */
+    .floor-tiles { position: absolute; bottom: 0; left: 0; right: 0; height: 32px; display: flex; }
+    .tile { flex: 1; border-right: 1px solid rgba(255,255,255,0.04); }
+    .col.active  .tile { background: #031505; }
+    .col.paused  .tile { background: #0d0800; }
+    .col.standby .tile { background: #0a0c14; }
+
+    /* Grid lines on walls */
+    .wall-grid { position: absolute; inset: 0; bottom: 32px; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 32px 32px; }
 
     /* Desk */
-    .desk { position: absolute; bottom: 42px; width: 70px; height: 14px; border-radius: 2px; }
-    .room.active  .desk { background: #15803d; border-top: 2px solid #22c55e; }
-    .room.paused  .desk { background: #92400e; border-top: 2px solid #f59e0b; }
-    .room.standby .desk { background: #1e293b; border-top: 2px solid #334155; }
-
-    .desk-leg { position: absolute; bottom: 32px; width: 4px; height: 10px; background: inherit; }
+    .desk { position: absolute; bottom: 32px; height: 12px; border-radius: 2px 2px 0 0; }
+    .col.active  .desk { background: #14532d; border-top: 2px solid #22c55e; box-shadow: 0 0 12px #22c55e33; }
+    .col.paused  .desk { background: #78350f; border-top: 2px solid #f59e0b; }
+    .col.standby .desk { background: #1e293b; border-top: 2px solid #334155; }
+    .desk-leg { position: absolute; bottom: -10px; width: 3px; height: 10px; }
+    .col.active  .desk-leg { background: #166534; }
+    .col.paused  .desk-leg { background: #92400e; }
+    .col.standby .desk-leg { background: #1e293b; }
 
     /* Monitor */
-    .monitor { position: absolute; bottom: 56px; width: 36px; height: 26px; border-radius: 2px; border: 2px solid; }
-    .room.active  .monitor { border-color: #22c55e; background: #052e16; }
-    .room.paused  .monitor { border-color: #f59e0b; background: #1c1007; }
-    .room.standby .monitor { border-color: #334155; background: #0a0a1a; }
+    .monitor { position: absolute; width: 44px; height: 32px; border-radius: 3px; border: 2px solid; }
+    .col.active  .monitor { border-color: #22c55e; background: #020f07; box-shadow: 0 0 16px #22c55e55; }
+    .col.paused  .monitor { border-color: #f59e0b; background: #0d0800; }
+    .col.standby .monitor { border-color: #1e293b; background: #080810; }
+    .monitor-stand { position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); width: 12px; height: 6px; border-radius: 0 0 2px 2px; }
+    .col.active  .monitor-stand { background: #14532d; }
+    .col.paused  .monitor-stand { background: #78350f; }
+    .col.standby .monitor-stand { background: #1e293b; }
 
-    .monitor-screen { position: absolute; inset: 3px; border-radius: 1px; }
-    .room.active  .monitor-screen { background: #4ade80; animation: screenflicker 3s infinite; }
-    .room.paused  .monitor-screen { background: #854d0e; }
-    .room.standby .monitor-screen { background: #1e293b; }
-    @keyframes screenflicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.7} 94%{opacity:1} }
+    /* Screen content */
+    .screen { position: absolute; inset: 3px; overflow: hidden; border-radius: 1px; }
+    .code-line { height: 2px; border-radius: 1px; margin-bottom: 2px; }
+    .col.active .code-line { background: #4ade80; animation: codepulse 1.8s ease-in-out infinite; }
+    .col.active .code-line:nth-child(2) { width: 65%; animation-delay: 0.2s; }
+    .col.active .code-line:nth-child(3) { width: 85%; animation-delay: 0.4s; }
+    .col.active .code-line:nth-child(4) { width: 45%; animation-delay: 0.6s; }
+    .col.active .code-line:nth-child(5) { width: 75%; animation-delay: 0.8s; }
+    @keyframes codepulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+    .col.paused .screen { background: #1a0f00; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #854d0e; }
+    .col.standby .screen { background: #0d1117; }
 
     /* Chair */
-    .chair { position: absolute; bottom: 34px; width: 24px; height: 20px; border-radius: 2px 2px 0 0; }
-    .room.active  .chair { background: #166534; border: 1px solid #22c55e; }
-    .room.paused  .chair { background: #78350f; border: 1px solid #f59e0b; }
-    .room.standby .chair { background: #1e293b; border: 1px solid #334155; }
+    .chair { position: absolute; bottom: 32px; width: 22px; height: 18px; border-radius: 3px 3px 0 0; }
+    .col.active  .chair { background: #166534; border: 1px solid #22c55e33; }
+    .col.paused  .chair { background: #78350f; border: 1px solid #f59e0b33; }
+    .col.standby .chair { background: #1e293b; border: 1px solid #33415533; }
 
-    /* Character */
-    .character { position: absolute; font-size: 24px; bottom: 54px; animation: none; }
-    .room.active .character { animation: work 2s infinite; }
-    @keyframes work { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    /* Characters */
+    .char { position: absolute; font-size: 22px; }
+    .col.active .char { animation: bobwork 1.8s ease-in-out infinite; }
+    .col.paused .char { animation: breathe 4s ease-in-out infinite; }
+    @keyframes bobwork  { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-4px) rotate(-3deg)} }
+    @keyframes breathe  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
 
     /* Thought bubble */
-    .thought { position: absolute; font-size: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 4px 8px; color: #94a3b8; white-space: nowrap; }
+    .thought { position: absolute; font-size: 9px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 3px 7px; color: #64748b; line-height: 1.4; }
+    .thought::before { content: ''; position: absolute; bottom: -5px; left: 10px; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.1); }
 
-    /* Info panel */
-    .info { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .info .project-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-    .room.active  .project-name { color: #4ade80; }
-    .room.paused  .project-name { color: #fbbf24; }
-    .room.standby .project-name { color: #64748b; }
+    /* Floating particles */
+    .particle { position: absolute; width: 2px; height: 2px; border-radius: 50%; animation: floatup 3s ease-in infinite; opacity: 0; }
+    .col.active .particle { background: #22c55e; }
+    @keyframes floatup { 0%{opacity:0;transform:translateY(0)} 30%{opacity:0.8} 100%{opacity:0;transform:translateY(-80px)} }
 
-    .info .desc { font-size: 11px; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+    /* Glow orb on active */
+    .glow-orb { position: absolute; width: 60px; height: 60px; border-radius: 50%; filter: blur(20px); opacity: 0.15; animation: orbbreathe 3s ease-in-out infinite; }
+    .col.active .glow-orb { background: #22c55e; }
+    @keyframes orbbreathe { 0%,100%{opacity:0.1} 50%{opacity:0.25} }
 
-    /* Tags */
-    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-    .tag { font-size: 10px; padding: 2px 7px; border-radius: 3px; }
-    .room.active  .tag { background: #052e16; color: #4ade80; border: 1px solid #166534; }
-    .room.paused  .tag { background: #1c1007; color: #fbbf24; border: 1px solid #92400e; }
-    .room.standby .tag { background: #0f172a; color: #475569; border: 1px solid #1e293b; }
+    /* Task pipeline */
+    .pipeline { padding: 14px 16px; flex: 1; overflow-y: auto; }
+    .pipeline-title { font-size: 10px; color: #334155; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
 
-    /* Standby queue */
-    .queue { padding: 0 14px 14px; }
-    .queue-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #1e293b; font-size: 12px; color: #475569; }
-    .queue-item:last-child { border-bottom: none; }
-    .queue-item .qi-icon { font-size: 14px; }
-    .queue-item .qi-label { flex: 1; }
-    .queue-item .qi-pri { font-size: 10px; padding: 1px 6px; border-radius: 10px; }
-    .pri-high { background: #431407; color: #fb923c; }
-    .pri-med  { background: #1c1007; color: #fbbf24; }
-    .pri-low  { background: #0f172a; color: #475569; border: 1px solid #1e293b; }
+    /* Task card */
+    .task-card { border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid; position: relative; overflow: hidden; }
+    .col.active  .task-card { background: #020f07; border-color: #14532d; }
+    .col.paused  .task-card { background: #0d0800; border-color: #451a03; }
+    .col.standby .task-card { background: #080810; border-color: #1e293b; }
 
-    /* Bottom legend */
-    .legend { padding: 16px 32px; display: flex; gap: 24px; border-top: 1px solid #1e293b; }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #475569; }
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .task-card.doing { border-left: 3px solid #22c55e; }
+    .task-card.done  { border-left: 3px solid #166534; opacity: 0.6; }
+    .task-card.next  { border-left: 3px solid #f59e0b; }
+    .task-card.waiting { border-left: 3px solid #334155; }
 
-    /* Scrolling code lines on active monitor */
-    .code-lines { position: absolute; inset: 3px; overflow: hidden; border-radius: 1px; }
-    .code-line { height: 3px; border-radius: 1px; margin-bottom: 2px; background: #4ade80; opacity: 0.6; animation: codescroll 2s linear infinite; }
-    .code-line:nth-child(2) { width: 60%; animation-delay: 0.3s; }
-    .code-line:nth-child(3) { width: 80%; animation-delay: 0.6s; }
-    .code-line:nth-child(4) { width: 40%; animation-delay: 0.9s; }
-    @keyframes codescroll { 0%{opacity:0.2} 50%{opacity:0.8} 100%{opacity:0.2} }
+    .tc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .tc-name { font-size: 12px; font-weight: 700; }
+    .col.active  .task-card.doing .tc-name { color: #4ade80; }
+    .col.active  .task-card.done  .tc-name { color: #166534; }
+    .col.paused  .task-card .tc-name { color: #fbbf24; }
+    .col.standby .task-card .tc-name { color: #475569; }
 
-    /* Particles for active room */
-    .particle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #4ade80; animation: float 3s infinite; opacity: 0; }
-    .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
-    .particle:nth-child(2) { left: 50%; animation-delay: 1s; }
-    .particle:nth-child(3) { left: 80%; animation-delay: 2s; }
-    @keyframes float { 0%{opacity:0;bottom:42px} 50%{opacity:0.6} 100%{opacity:0;bottom:120px} }
+    .tc-badge { font-size: 9px; padding: 1px 6px; border-radius: 10px; font-weight: 700; letter-spacing: 0.5px; }
+    .badge-live    { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+    .badge-done    { background: #052e16; color: #166534; }
+    .badge-paused  { background: #1c1007; color: #f59e0b; }
+    .badge-queued  { background: #0f172a; color: #475569; border: 1px solid #1e293b; }
+    .badge-high    { background: #431407; color: #fb923c; }
+    .badge-med     { background: #1c1007; color: #fbbf24; }
 
-    /* Title bar ticker */
-    .ticker { background: #0a0f1e; border-top: 1px solid #1e293b; padding: 6px 32px; font-size: 11px; color: #334155; overflow: hidden; white-space: nowrap; }
-    .ticker span { display: inline-block; animation: ticker 20s linear infinite; }
-    @keyframes ticker { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+    .tc-desc { font-size: 10px; color: #475569; line-height: 1.5; margin-bottom: 6px; }
+
+    /* Progress bar */
+    .progress-wrap { height: 3px; background: #1e293b; border-radius: 2px; margin-bottom: 6px; }
+    .progress-bar  { height: 100%; border-radius: 2px; transition: width 1s ease; }
+    .col.active  .progress-bar { background: #22c55e; box-shadow: 0 0 6px #22c55e88; }
+    .col.paused  .progress-bar { background: #f59e0b; }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 3px; }
+    .step { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+    .step-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .step.done  .step-dot { background: #22c55e; }
+    .step.doing .step-dot { background: #38bdf8; animation: pulse 1s infinite; }
+    .step.todo  .step-dot { background: #1e293b; border: 1px solid #334155; }
+    .step.done  span { color: #166534; text-decoration: line-through; }
+    .step.doing span { color: #7dd3fc; }
+    .step.todo  span { color: #334155; }
+
+    /* Tags row */
+    .tc-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .tc-tag { font-size: 9px; padding: 1px 5px; border-radius: 3px; }
+    .col.active  .tc-tag { background: #031a0a; color: #4ade80; border: 1px solid #14532d; }
+    .col.paused  .tc-tag { background: #1c1007; color: #fbbf24; border: 1px solid #78350f; }
+    .col.standby .tc-tag { background: #0f172a; color: #334155; border: 1px solid #1e293b; }
+
+    /* Scan line animation on active */
+    .scanline { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(transparent, #22c55e22, transparent); animation: scan 4s linear infinite; pointer-events: none; }
+    @keyframes scan { 0%{top:-2px;opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+
+    /* Queue panel */
+    .queue-section { padding: 12px 16px; border-bottom: 1px solid #1e293b; }
+    .qs-title { font-size: 10px; color: #334155; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+    .qi { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid #0f172a; }
+    .qi:last-child { border-bottom: none; }
+    .qi-num { font-size: 10px; color: #1e293b; width: 14px; flex-shrink: 0; text-align: right; }
+    .qi-body { flex: 1; }
+    .qi-name { font-size: 11px; color: #475569; margin-bottom: 2px; }
+    .qi-sub  { font-size: 10px; color: #1e293b; }
+    .qi-pri  { font-size: 9px; padding: 1px 5px; border-radius: 8px; flex-shrink: 0; }
+    .pri-h { background: #431407; color: #fb923c; }
+    .pri-m { background: #1c1007; color: #d97706; }
+    .pri-l { background: #0f172a; color: #334155; border: 1px solid #1e293b; }
+
+    /* Stats */
+    .stats-row { display: flex; padding: 10px 16px; gap: 8px; border-bottom: 1px solid #1e293b; }
+    .stat-box { flex: 1; background: #080810; border: 1px solid #1e293b; border-radius: 4px; padding: 8px; text-align: center; }
+    .stat-box .sn { font-size: 20px; font-weight: 700; color: #38bdf8; }
+    .stat-box .sl { font-size: 9px; color: #334155; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Legend */
+    .legend { padding: 10px 20px; display: flex; gap: 20px; border-top: 1px solid #1e293b; background: #060612; flex-wrap: wrap; }
+    .li { display: flex; align-items: center; gap: 6px; font-size: 10px; color: #334155; }
+    .ld { width: 6px; height: 6px; border-radius: 50%; }
   </style>
 </head>
 <body>
@@ -137,166 +206,325 @@
 </div>
 
 <div class="ticker">
-  <span>● CHOPPY BOT — LIVE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; FIELDSYNC MVP — COMPLETE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; VOICE + WEB SEARCH — ACTIVE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; STANDING BY: DEPLOY · EMPLOYEE MGMT · DOMAIN EMAIL · MOBILE DASHBOARD &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp;</span>
+  <span>● CHOPPY BOT LIVE &nbsp;·&nbsp; VOICE ACTIVE &nbsp;·&nbsp; WEB SEARCH ON &nbsp;·&nbsp; FIELDSYNC MVP COMPLETE &nbsp;·&nbsp; choppy.kingstondatagroup.com DEPLOYED &nbsp;·&nbsp; NEXT: FIELDSYNC DEPLOY · EMPLOYEE MGMT · MOBILE DASHBOARD · PAID PLANS &nbsp;·&nbsp; SESSION UPTIME: <span id="uptime">00:00:00</span> &nbsp;·&nbsp;</span>
 </div>
 
-<div class="floor">
+<div class="workspace">
 
-  <!-- ACTIVE: Choppy Bot -->
-  <div class="room active">
-    <div class="room-label">
-      <span>🟢 Active</span>
-      <div class="status-dot"></div>
+  <!-- ══════════════════════ ACTIVE ══════════════════════ -->
+  <div class="col active">
+    <div class="col-header">
+      <span>🟢 Active — Choppy Bot</span>
+      <div class="hdr-dot"></div>
     </div>
-    <div class="scene">
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="particle"></div>
-      <div class="floor-line"></div>
 
-      <!-- Desk setup -->
-      <div class="desk" style="left:24px">
-        <div class="desk-leg" style="left:4px"></div>
-        <div class="desk-leg" style="right:4px"></div>
+    <div class="scene">
+      <div class="glow-orb" style="bottom:20px;left:30%"></div>
+      <div class="wall-grid"></div>
+
+      <!-- Particles -->
+      <div class="particle" style="left:22%;animation-delay:0s;bottom:44px"></div>
+      <div class="particle" style="left:48%;animation-delay:1.2s;bottom:44px"></div>
+      <div class="particle" style="left:70%;animation-delay:2.4s;bottom:44px"></div>
+      <div class="particle" style="left:35%;animation-delay:0.6s;bottom:44px"></div>
+
+      <!-- Desk 1 — Choppy -->
+      <div class="desk" style="left:18px;width:80px">
+        <div class="desk-leg" style="left:6px"></div>
+        <div class="desk-leg" style="right:6px"></div>
       </div>
-      <div class="monitor" style="left:30px">
-        <div class="code-lines">
+      <div class="monitor" style="left:26px;bottom:44px">
+        <div class="screen">
           <div class="code-line" style="width:90%"></div>
           <div class="code-line"></div>
           <div class="code-line"></div>
           <div class="code-line"></div>
+          <div class="code-line"></div>
+        </div>
+        <div class="monitor-stand"></div>
+      </div>
+      <div class="chair" style="left:30px"></div>
+      <div class="char" style="left:34px;bottom:50px">🤖</div>
+      <div class="thought" style="left:62px;bottom:90px">listening...<br>transcribing...</div>
+
+      <!-- Desk 2 — Web Search -->
+      <div class="desk" style="right:18px;width:80px">
+        <div class="desk-leg" style="left:6px"></div>
+        <div class="desk-leg" style="right:6px"></div>
+      </div>
+      <div class="monitor" style="right:26px;bottom:44px">
+        <div class="screen">
+          <div class="code-line" style="width:70%;animation-delay:0.5s"></div>
+          <div class="code-line" style="animation-delay:0.7s"></div>
+          <div class="code-line" style="animation-delay:0.9s"></div>
+          <div class="code-line" style="animation-delay:1.1s"></div>
+          <div class="code-line" style="animation-delay:1.3s"></div>
+        </div>
+        <div class="monitor-stand"></div>
+      </div>
+      <div class="chair" style="right:30px"></div>
+      <div class="char" style="right:34px;bottom:50px">📡</div>
+      <div class="thought" style="right:80px;bottom:90px">searching<br>web...</div>
+
+      <div class="floor-tiles">
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+      </div>
+    </div>
+
+    <!-- Task pipeline -->
+    <div class="pipeline">
+      <div class="pipeline-title">Task pipeline</div>
+
+      <div class="task-card doing">
+        <div class="scanline"></div>
+        <div class="tc-top">
+          <div class="tc-name">🎤 Voice Processing</div>
+          <span class="tc-badge badge-live">LIVE</span>
+        </div>
+        <div class="tc-desc">Receiving Telegram voice messages, transcribing via Whisper, generating AI responses.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="steps">
+          <div class="step done"><div class="step-dot"></div><span>Telegram bot polling</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Groq Whisper transcription</span></div>
+          <div class="step doing"><div class="step-dot"></div><span>Claude AI response generation</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Message delivery to Eliott</span></div>
+        </div>
+        <div class="tc-tags">
+          <span class="tc-tag">Telegram</span>
+          <span class="tc-tag">Groq Whisper</span>
+          <span class="tc-tag">Claude Sonnet</span>
         </div>
       </div>
-      <div class="chair" style="left:28px"></div>
-      <div class="character" style="left:32px">🤖</div>
-      <div class="thought" style="left:68px; bottom:80px">processing...</div>
 
-      <!-- Second desk -->
-      <div class="desk" style="right:24px">
-        <div class="desk-leg" style="left:4px"></div>
-        <div class="desk-leg" style="right:4px"></div>
+      <div class="task-card doing">
+        <div class="tc-top">
+          <div class="tc-name">🌐 Web Search</div>
+          <span class="tc-badge badge-live">LIVE</span>
+        </div>
+        <div class="tc-desc">Auto-detecting questions needing live data and enriching answers with Serper search results.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+        <div class="steps">
+          <div class="step done"><div class="step-dot"></div><span>Query intent detection</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Serper Google search API</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Context injection into Claude</span></div>
+        </div>
+        <div class="tc-tags">
+          <span class="tc-tag">Serper API</span>
+          <span class="tc-tag">2,500 free searches</span>
+        </div>
       </div>
-      <div class="monitor" style="right:30px">
-        <div class="monitor-screen"></div>
-      </div>
-      <div class="chair" style="right:28px"></div>
-      <div class="character" style="right:32px">📡</div>
-    </div>
-    <div class="info">
-      <div class="project-name">Choppy Personal Bot</div>
-      <div class="desc">Telegram bot with voice input, Whisper transcription, Claude AI responses and live web search.</div>
-      <div class="tags">
-        <span class="tag">🎤 Voice</span>
-        <span class="tag">🌐 Web Search</span>
-        <span class="tag">🤖 Claude AI</span>
-        <span class="tag">Telegram</span>
+
+      <div class="task-card done">
+        <div class="tc-top">
+          <div class="tc-name">🚀 Workspace Published</div>
+          <span class="tc-badge badge-done">DONE</span>
+        </div>
+        <div class="tc-desc">choppy.kingstondatagroup.com deployed via Vercel + GitHub + GoDaddy CNAME.</div>
+        <div class="steps">
+          <div class="step done"><div class="step-dot"></div><span>GitHub repo created</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Vercel deployment</span></div>
+          <div class="step done"><div class="step-dot"></div><span>Custom subdomain DNS</span></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- PAUSED: FieldSync -->
-  <div class="room paused">
-    <div class="room-label">
-      <span>🟡 Paused</span>
-      <div class="status-dot"></div>
+  <!-- ══════════════════════ PAUSED ══════════════════════ -->
+  <div class="col paused">
+    <div class="col-header">
+      <span>🟡 Paused — FieldSync</span>
+      <div class="hdr-dot"></div>
     </div>
+
     <div class="scene">
-      <div class="floor-line"></div>
+      <div class="wall-grid"></div>
 
-      <!-- Building under construction -->
-      <div style="position:absolute;bottom:42px;left:50%;transform:translateX(-50%);text-align:center">
-        <div style="font-size:48px;line-height:1">🏗️</div>
-      </div>
+      <!-- Building -->
+      <div style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);font-size:52px;line-height:1;filter:drop-shadow(0 0 10px #f59e0b44)">🏗️</div>
 
-      <div class="desk" style="left:16px">
-        <div class="desk-leg" style="left:4px"></div>
-        <div class="desk-leg" style="right:4px"></div>
+      <!-- Sleeping dev -->
+      <div class="desk" style="left:14px;width:70px">
+        <div class="desk-leg" style="left:6px"></div>
+        <div class="desk-leg" style="right:6px"></div>
       </div>
-      <div class="monitor" style="left:22px">
-        <div class="monitor-screen"></div>
+      <div class="monitor" style="left:20px;bottom:44px">
+        <div class="screen">PAUSED</div>
+        <div class="monitor-stand"></div>
       </div>
-      <div class="chair" style="left:20px"></div>
-      <div class="character" style="left:22px">😴</div>
+      <div class="chair" style="left:22px"></div>
+      <div class="char" style="left:24px;bottom:50px">😴</div>
+      <div class="thought" style="left:52px;bottom:88px;font-size:8px">MVP done...<br>zzzz...</div>
 
-      <div class="thought" style="right:14px; bottom:90px; font-size:9px">MVP complete<br>awaiting v2...</div>
+      <div class="floor-tiles">
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+        <div class="tile"></div><div class="tile"></div><div class="tile"></div>
+      </div>
     </div>
-    <div class="info">
-      <div class="project-name">FieldSync — Field Service App</div>
-      <div class="desc">MVP complete. Telegram bot, real-time dashboard, supply requests, email alerts, photo uploads.</div>
-      <div class="tags">
-        <span class="tag">✅ MVP Done</span>
-        <span class="tag">Supabase</span>
-        <span class="tag">Node.js</span>
-        <span class="tag">Telegram</span>
+
+    <div class="pipeline">
+      <div class="pipeline-title">Completed tasks</div>
+
+      <div class="task-card done">
+        <div class="tc-top">
+          <div class="tc-name">✅ Telegram Bot</div>
+          <span class="tc-badge badge-done">DONE</span>
+        </div>
+        <div class="tc-desc">Employee check-in, supply requests, bottleneck flags, site photos with Supabase Storage.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+      </div>
+
+      <div class="task-card done">
+        <div class="tc-top">
+          <div class="tc-name">✅ Real-Time Dashboard</div>
+          <span class="tc-badge badge-done">DONE</span>
+        </div>
+        <div class="tc-desc">Live job cards, clickable stat bar, crew tracker, supply queue with Supabase realtime.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+      </div>
+
+      <div class="task-card done">
+        <div class="tc-top">
+          <div class="tc-name">✅ Email + Telegram Alerts</div>
+          <span class="tc-badge badge-done">DONE</span>
+        </div>
+        <div class="tc-desc">Instant alerts on supply requests, bottlenecks, photos. Daily 6pm digest via Resend.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:100%"></div></div>
+      </div>
+
+      <div class="pipeline-title" style="margin-top:12px">Pending v2 tasks</div>
+
+      <div class="task-card next">
+        <div class="tc-top">
+          <div class="tc-name">🚀 Production Deploy</div>
+          <span class="tc-badge badge-high">HIGH</span>
+        </div>
+        <div class="tc-desc">Host FieldSync publicly so it runs 24/7 without your laptop open.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:0%"></div></div>
+        <div class="steps">
+          <div class="step todo"><div class="step-dot"></div><span>Choose host (Railway/Render)</span></div>
+          <div class="step todo"><div class="step-dot"></div><span>Deploy API + bot</span></div>
+          <div class="step todo"><div class="step-dot"></div><span>Connect custom domain</span></div>
+        </div>
+      </div>
+
+      <div class="task-card next">
+        <div class="tc-top">
+          <div class="tc-name">👥 Employee Management</div>
+          <span class="tc-badge badge-high">HIGH</span>
+        </div>
+        <div class="tc-desc">Add/remove crew members from dashboard. Assign to jobs. Track history.</div>
+        <div class="progress-wrap"><div class="progress-bar" style="width:0%"></div></div>
       </div>
     </div>
   </div>
 
-  <!-- STANDBY: Queue -->
-  <div class="room standby" style="min-width:260px;flex:0.8">
-    <div class="room-label">
+  <!-- ══════════════════════ STANDBY ══════════════════════ -->
+  <div class="col standby">
+    <div class="col-header">
       <span>⏸ Standby Queue</span>
-      <div class="status-dot"></div>
+      <div class="hdr-dot"></div>
     </div>
-    <div class="scene" style="height:60px;padding:10px 14px">
-      <div style="font-size:11px;color:#334155;letter-spacing:1px">NEXT UP →</div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="sn">2</div><div class="sl">Active</div></div>
+      <div class="stat-box"><div class="sn">1</div><div class="sl">Paused</div></div>
+      <div class="stat-box"><div class="sn" id="queue-count">7</div><div class="sl">Queued</div></div>
     </div>
-    <div class="queue">
-      <div class="queue-item">
-        <span class="qi-icon">🚀</span>
-        <span class="qi-label">Deploy FieldSync to production</span>
-        <span class="qi-pri pri-high">HIGH</span>
+
+    <div class="queue-section">
+      <div class="qs-title">FieldSync v2</div>
+      <div class="qi">
+        <div class="qi-num">1</div>
+        <div class="qi-body">
+          <div class="qi-name">🚀 Deploy to production</div>
+          <div class="qi-sub">Railway or Render · 24/7 uptime</div>
+        </div>
+        <span class="qi-pri pri-h">HIGH</span>
       </div>
-      <div class="queue-item">
-        <span class="qi-icon">👥</span>
-        <span class="qi-label">Employee management dashboard</span>
-        <span class="qi-pri pri-high">HIGH</span>
+      <div class="qi">
+        <div class="qi-num">2</div>
+        <div class="qi-body">
+          <div class="qi-name">👥 Employee management page</div>
+          <div class="qi-sub">Add/remove crew · assign to jobs</div>
+        </div>
+        <span class="qi-pri pri-h">HIGH</span>
       </div>
-      <div class="queue-item">
-        <span class="qi-icon">📧</span>
-        <span class="qi-label">Verify kingstondatagroup.com email</span>
-        <span class="qi-pri pri-med">MED</span>
+      <div class="qi">
+        <div class="qi-num">3</div>
+        <div class="qi-body">
+          <div class="qi-name">📧 Domain email setup</div>
+          <div class="qi-sub">Resend · kingstondatagroup.com</div>
+        </div>
+        <span class="qi-pri pri-m">MED</span>
       </div>
-      <div class="queue-item">
-        <span class="qi-icon">📱</span>
-        <span class="qi-label">Mobile-friendly dashboard</span>
-        <span class="qi-pri pri-med">MED</span>
+      <div class="qi">
+        <div class="qi-num">4</div>
+        <div class="qi-body">
+          <div class="qi-name">📱 Mobile dashboard</div>
+          <div class="qi-sub">Responsive layout · touch-friendly</div>
+        </div>
+        <span class="qi-pri pri-m">MED</span>
       </div>
-      <div class="queue-item">
-        <span class="qi-icon">💳</span>
-        <span class="qi-label">Customer onboarding + paid plans</span>
-        <span class="qi-pri pri-med">MED</span>
-      </div>
-      <div class="queue-item">
-        <span class="qi-icon">🧠</span>
-        <span class="qi-label">Persistent memory for Choppy</span>
-        <span class="qi-pri pri-low">LOW</span>
-      </div>
-      <div class="queue-item">
-        <span class="qi-icon">🗣️</span>
-        <span class="qi-label">Choppy voice replies (text-to-speech)</span>
-        <span class="qi-pri pri-low">LOW</span>
+      <div class="qi">
+        <div class="qi-num">5</div>
+        <div class="qi-body">
+          <div class="qi-name">💳 Paid plans + onboarding</div>
+          <div class="qi-sub">Stripe · $49/$99/$199 tiers</div>
+        </div>
+        <span class="qi-pri pri-m">MED</span>
       </div>
     </div>
+
+    <div class="queue-section">
+      <div class="qs-title">Choppy Bot v2</div>
+      <div class="qi">
+        <div class="qi-num">6</div>
+        <div class="qi-body">
+          <div class="qi-name">🧠 Persistent memory</div>
+          <div class="qi-sub">Remember across sessions</div>
+        </div>
+        <span class="qi-pri pri-m">MED</span>
+      </div>
+      <div class="qi">
+        <div class="qi-num">7</div>
+        <div class="qi-body">
+          <div class="qi-name">🗣️ Voice replies</div>
+          <div class="qi-sub">Text-to-speech · Choppy talks back</div>
+        </div>
+        <span class="qi-pri pri-l">LOW</span>
+      </div>
+    </div>
+
   </div>
 
 </div>
 
 <div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Running now</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Paused / MVP complete</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#334155"></div> Standby queue</div>
-  <div class="legend-item" style="margin-left:auto;color:#1e293b">Last updated: <span id="lastupdate">—</span></div>
+  <div class="li"><div class="ld" style="background:#22c55e"></div> Running live</div>
+  <div class="li"><div class="ld" style="background:#38bdf8"></div> In progress</div>
+  <div class="li"><div class="ld" style="background:#f59e0b"></div> Paused / next up</div>
+  <div class="li"><div class="ld" style="background:#334155"></div> Queued</div>
+  <div class="li"><div class="ld" style="background:#166534"></div> Complete</div>
+  <div class="li" style="margin-left:auto">choppy.kingstondatagroup.com</div>
 </div>
 
 <script>
+  // Clock
   function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-    document.getElementById('lastupdate').textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
   }
-  updateClock();
-  setInterval(updateClock, 1000);
+  updateClock(); setInterval(updateClock, 1000);
+
+  // Uptime
+  const start = Date.now();
+  setInterval(() => {
+    const s = Math.floor((Date.now() - start) / 1000);
+    const h = String(Math.floor(s/3600)).padStart(2,'0');
+    const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+    const sc = String(s%60).padStart(2,'0');
+    document.getElementById('uptime').textContent = `${h}:${m}:${sc}`;
+  }, 1000);
 </script>
 </body>
 </html>
