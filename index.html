@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choppy's Workspace</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a1a; font-family: 'Courier New', monospace; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; }
+
+    /* Header */
+    .header { padding: 16px 32px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 16px; color: #38bdf8; letter-spacing: 2px; text-transform: uppercase; }
+    .clock { font-size: 13px; color: #475569; }
+
+    /* Floor layout */
+    .floor { display: flex; gap: 24px; padding: 32px; align-items: flex-start; flex-wrap: wrap; }
+
+    /* Room */
+    .room { border: 2px solid; border-radius: 4px; padding: 0; min-width: 280px; flex: 1; position: relative; overflow: hidden; }
+    .room.active  { border-color: #22c55e; background: #052e16; }
+    .room.paused  { border-color: #f59e0b; background: #1c1007; }
+    .room.standby { border-color: #334155; background: #0f172a; }
+
+    .room-label { padding: 8px 14px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 2px solid; display: flex; align-items: center; justify-content: space-between; }
+    .room.active  .room-label { border-color: #22c55e; color: #4ade80; background: #052e16; }
+    .room.paused  .room-label { border-color: #f59e0b; color: #fbbf24; background: #1c1007; }
+    .room.standby .room-label { border-color: #334155; color: #64748b; background: #0f172a; }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .room.active  .status-dot { background: #22c55e; animation: pulse 1.5s infinite; }
+    .room.paused  .status-dot { background: #f59e0b; animation: blink 2s infinite; }
+    .room.standby .status-dot { background: #334155; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Scene canvas */
+    .scene { position: relative; height: 180px; padding: 12px; }
+
+    /* Floor line */
+    .floor-line { position: absolute; bottom: 40px; left: 12px; right: 12px; height: 2px; background: rgba(255,255,255,0.08); }
+
+    /* Pixel art elements */
+    .pixel { position: absolute; image-rendering: pixelated; font-size: 28px; line-height: 1; }
+
+    /* Desk */
+    .desk { position: absolute; bottom: 42px; width: 70px; height: 14px; border-radius: 2px; }
+    .room.active  .desk { background: #15803d; border-top: 2px solid #22c55e; }
+    .room.paused  .desk { background: #92400e; border-top: 2px solid #f59e0b; }
+    .room.standby .desk { background: #1e293b; border-top: 2px solid #334155; }
+
+    .desk-leg { position: absolute; bottom: 32px; width: 4px; height: 10px; background: inherit; }
+
+    /* Monitor */
+    .monitor { position: absolute; bottom: 56px; width: 36px; height: 26px; border-radius: 2px; border: 2px solid; }
+    .room.active  .monitor { border-color: #22c55e; background: #052e16; }
+    .room.paused  .monitor { border-color: #f59e0b; background: #1c1007; }
+    .room.standby .monitor { border-color: #334155; background: #0a0a1a; }
+
+    .monitor-screen { position: absolute; inset: 3px; border-radius: 1px; }
+    .room.active  .monitor-screen { background: #4ade80; animation: screenflicker 3s infinite; }
+    .room.paused  .monitor-screen { background: #854d0e; }
+    .room.standby .monitor-screen { background: #1e293b; }
+    @keyframes screenflicker { 0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.7} 94%{opacity:1} }
+
+    /* Chair */
+    .chair { position: absolute; bottom: 34px; width: 24px; height: 20px; border-radius: 2px 2px 0 0; }
+    .room.active  .chair { background: #166534; border: 1px solid #22c55e; }
+    .room.paused  .chair { background: #78350f; border: 1px solid #f59e0b; }
+    .room.standby .chair { background: #1e293b; border: 1px solid #334155; }
+
+    /* Character */
+    .character { position: absolute; font-size: 24px; bottom: 54px; animation: none; }
+    .room.active .character { animation: work 2s infinite; }
+    @keyframes work { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+    /* Thought bubble */
+    .thought { position: absolute; font-size: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 4px 8px; color: #94a3b8; white-space: nowrap; }
+
+    /* Info panel */
+    .info { padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .info .project-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .room.active  .project-name { color: #4ade80; }
+    .room.paused  .project-name { color: #fbbf24; }
+    .room.standby .project-name { color: #64748b; }
+
+    .info .desc { font-size: 11px; color: #64748b; line-height: 1.5; margin-bottom: 8px; }
+
+    /* Tags */
+    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: 3px; }
+    .room.active  .tag { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+    .room.paused  .tag { background: #1c1007; color: #fbbf24; border: 1px solid #92400e; }
+    .room.standby .tag { background: #0f172a; color: #475569; border: 1px solid #1e293b; }
+
+    /* Standby queue */
+    .queue { padding: 0 14px 14px; }
+    .queue-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid #1e293b; font-size: 12px; color: #475569; }
+    .queue-item:last-child { border-bottom: none; }
+    .queue-item .qi-icon { font-size: 14px; }
+    .queue-item .qi-label { flex: 1; }
+    .queue-item .qi-pri { font-size: 10px; padding: 1px 6px; border-radius: 10px; }
+    .pri-high { background: #431407; color: #fb923c; }
+    .pri-med  { background: #1c1007; color: #fbbf24; }
+    .pri-low  { background: #0f172a; color: #475569; border: 1px solid #1e293b; }
+
+    /* Bottom legend */
+    .legend { padding: 16px 32px; display: flex; gap: 24px; border-top: 1px solid #1e293b; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #475569; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Scrolling code lines on active monitor */
+    .code-lines { position: absolute; inset: 3px; overflow: hidden; border-radius: 1px; }
+    .code-line { height: 3px; border-radius: 1px; margin-bottom: 2px; background: #4ade80; opacity: 0.6; animation: codescroll 2s linear infinite; }
+    .code-line:nth-child(2) { width: 60%; animation-delay: 0.3s; }
+    .code-line:nth-child(3) { width: 80%; animation-delay: 0.6s; }
+    .code-line:nth-child(4) { width: 40%; animation-delay: 0.9s; }
+    @keyframes codescroll { 0%{opacity:0.2} 50%{opacity:0.8} 100%{opacity:0.2} }
+
+    /* Particles for active room */
+    .particle { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #4ade80; animation: float 3s infinite; opacity: 0; }
+    .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 50%; animation-delay: 1s; }
+    .particle:nth-child(3) { left: 80%; animation-delay: 2s; }
+    @keyframes float { 0%{opacity:0;bottom:42px} 50%{opacity:0.6} 100%{opacity:0;bottom:120px} }
+
+    /* Title bar ticker */
+    .ticker { background: #0a0f1e; border-top: 1px solid #1e293b; padding: 6px 32px; font-size: 11px; color: #334155; overflow: hidden; white-space: nowrap; }
+    .ticker span { display: inline-block; animation: ticker 20s linear infinite; }
+    @keyframes ticker { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ Choppy's Workspace</h1>
+  <div class="clock" id="clock">—</div>
+</div>
+
+<div class="ticker">
+  <span>● CHOPPY BOT — LIVE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; FIELDSYNC MVP — COMPLETE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; VOICE + WEB SEARCH — ACTIVE &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; STANDING BY: DEPLOY · EMPLOYEE MGMT · DOMAIN EMAIL · MOBILE DASHBOARD &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp;</span>
+</div>
+
+<div class="floor">
+
+  <!-- ACTIVE: Choppy Bot -->
+  <div class="room active">
+    <div class="room-label">
+      <span>🟢 Active</span>
+      <div class="status-dot"></div>
+    </div>
+    <div class="scene">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="floor-line"></div>
+
+      <!-- Desk setup -->
+      <div class="desk" style="left:24px">
+        <div class="desk-leg" style="left:4px"></div>
+        <div class="desk-leg" style="right:4px"></div>
+      </div>
+      <div class="monitor" style="left:30px">
+        <div class="code-lines">
+          <div class="code-line" style="width:90%"></div>
+          <div class="code-line"></div>
+          <div class="code-line"></div>
+          <div class="code-line"></div>
+        </div>
+      </div>
+      <div class="chair" style="left:28px"></div>
+      <div class="character" style="left:32px">🤖</div>
+      <div class="thought" style="left:68px; bottom:80px">processing...</div>
+
+      <!-- Second desk -->
+      <div class="desk" style="right:24px">
+        <div class="desk-leg" style="left:4px"></div>
+        <div class="desk-leg" style="right:4px"></div>
+      </div>
+      <div class="monitor" style="right:30px">
+        <div class="monitor-screen"></div>
+      </div>
+      <div class="chair" style="right:28px"></div>
+      <div class="character" style="right:32px">📡</div>
+    </div>
+    <div class="info">
+      <div class="project-name">Choppy Personal Bot</div>
+      <div class="desc">Telegram bot with voice input, Whisper transcription, Claude AI responses and live web search.</div>
+      <div class="tags">
+        <span class="tag">🎤 Voice</span>
+        <span class="tag">🌐 Web Search</span>
+        <span class="tag">🤖 Claude AI</span>
+        <span class="tag">Telegram</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSED: FieldSync -->
+  <div class="room paused">
+    <div class="room-label">
+      <span>🟡 Paused</span>
+      <div class="status-dot"></div>
+    </div>
+    <div class="scene">
+      <div class="floor-line"></div>
+
+      <!-- Building under construction -->
+      <div style="position:absolute;bottom:42px;left:50%;transform:translateX(-50%);text-align:center">
+        <div style="font-size:48px;line-height:1">🏗️</div>
+      </div>
+
+      <div class="desk" style="left:16px">
+        <div class="desk-leg" style="left:4px"></div>
+        <div class="desk-leg" style="right:4px"></div>
+      </div>
+      <div class="monitor" style="left:22px">
+        <div class="monitor-screen"></div>
+      </div>
+      <div class="chair" style="left:20px"></div>
+      <div class="character" style="left:22px">😴</div>
+
+      <div class="thought" style="right:14px; bottom:90px; font-size:9px">MVP complete<br>awaiting v2...</div>
+    </div>
+    <div class="info">
+      <div class="project-name">FieldSync — Field Service App</div>
+      <div class="desc">MVP complete. Telegram bot, real-time dashboard, supply requests, email alerts, photo uploads.</div>
+      <div class="tags">
+        <span class="tag">✅ MVP Done</span>
+        <span class="tag">Supabase</span>
+        <span class="tag">Node.js</span>
+        <span class="tag">Telegram</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STANDBY: Queue -->
+  <div class="room standby" style="min-width:260px;flex:0.8">
+    <div class="room-label">
+      <span>⏸ Standby Queue</span>
+      <div class="status-dot"></div>
+    </div>
+    <div class="scene" style="height:60px;padding:10px 14px">
+      <div style="font-size:11px;color:#334155;letter-spacing:1px">NEXT UP →</div>
+    </div>
+    <div class="queue">
+      <div class="queue-item">
+        <span class="qi-icon">🚀</span>
+        <span class="qi-label">Deploy FieldSync to production</span>
+        <span class="qi-pri pri-high">HIGH</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">👥</span>
+        <span class="qi-label">Employee management dashboard</span>
+        <span class="qi-pri pri-high">HIGH</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">📧</span>
+        <span class="qi-label">Verify kingstondatagroup.com email</span>
+        <span class="qi-pri pri-med">MED</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">📱</span>
+        <span class="qi-label">Mobile-friendly dashboard</span>
+        <span class="qi-pri pri-med">MED</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">💳</span>
+        <span class="qi-label">Customer onboarding + paid plans</span>
+        <span class="qi-pri pri-med">MED</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">🧠</span>
+        <span class="qi-label">Persistent memory for Choppy</span>
+        <span class="qi-pri pri-low">LOW</span>
+      </div>
+      <div class="queue-item">
+        <span class="qi-icon">🗣️</span>
+        <span class="qi-label">Choppy voice replies (text-to-speech)</span>
+        <span class="qi-pri pri-low">LOW</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Running now</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Paused / MVP complete</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#334155"></div> Standby queue</div>
+  <div class="legend-item" style="margin-left:auto;color:#1e293b">Last updated: <span id="lastupdate">—</span></div>
+</div>
+
+<script>
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+    document.getElementById('lastupdate').textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>
